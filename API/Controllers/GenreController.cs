@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.DTOs;
+using API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -55,6 +56,37 @@ namespace API.Controllers
             };
 
             return Ok(toReturn);
+        }
+
+        [HttpPost("create")]
+        public IActionResult Create(GenreAddEditDto model)
+        {
+            if (GenreNameExists(model.Name))
+            {
+                return BadRequest("Genre name already exists!");
+            }
+
+            var genreToAdd = new Genre
+            {
+                Name = model.Name.ToLower(),
+            };
+
+            _applicationDb.Genres.Add(genreToAdd);
+            _applicationDb.SaveChanges();
+
+            return Created(nameof(GetOne), model.Name);
+        }
+
+        private bool GenreNameExists(string name)
+        {
+            var fetchedGenre = _applicationDb.Genres.FirstOrDefault(genre => genre.Name.ToLower().Equals(name.ToLower()));
+
+            if (fetchedGenre == null)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
