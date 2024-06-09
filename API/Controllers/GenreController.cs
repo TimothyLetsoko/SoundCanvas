@@ -21,5 +21,18 @@ namespace API.Controllers
         {
             return Ok(_applicationDb.Genres.ToList());
         }
+
+        [HttpGet("get-one/{id}")]
+        public IActionResult GetOne(int id)
+        {
+            var genre = _applicationDb.Genres.FirstOrDefault(x => x.Id == id);
+
+            if (genre == null) 
+            {
+                return NotFound();
+            }
+
+            return Ok(genre);
+        }
     }
 }
