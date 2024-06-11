@@ -124,6 +124,22 @@ namespace API.Controllers
             return NoContent();
         }
 
+        [HttpDelete("delete/{id}")]
+        public ActionResult Delete(int id)
+        {
+            var fetchedArtist = _applicationDb.Artists.Find(id);
+
+            if (fetchedArtist == null)
+            {
+                return NotFound("Artist Id not found!");
+            }
+
+            _applicationDb.Artists.Remove(fetchedArtist);
+            _applicationDb.SaveChanges();
+
+            return NoContent();
+        }
+
         private bool ArtistNameExists(string name)
         {
             return _applicationDb.Artists.Any(artist => artist.Name.ToLower() == name.ToLower());
