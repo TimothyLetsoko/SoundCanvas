@@ -58,5 +58,44 @@ namespace API.Controllers
 
             return artist;
         }
+
+        [HttpPut("create")]
+        public ActionResult Create(ArtistAddEditDto model)
+        {
+            if (ArtistNameExists(model.Name.ToLower()))
+            {
+                return BadRequest("Username already exists!");
+            }
+
+            var fetchedGenre = GetGenreByName(model.Genre.ToLower());
+
+            if (fetchedGenre == null)
+            {
+                return BadRequest("Genre name does not exist");
+            }
+
+            var toAdd = new Artist
+            {
+                Id = model.Id,
+                Name = model.Name,
+                PhotoUrl = model.PhotoUrl,
+                Genre = fetchedGenre
+            };
+
+            _applicationDb.Artists.Add(toAdd);
+            _applicationDb.SaveChanges();
+
+            return CreatedAtAction(nameof(GetOne), new { id = toAdd.Id }, toAdd);
+        }
+
+        private bool ArtistNameExists(string name)
+        {
+            return _applicationDb.Artists.Any(artist => artist.Name == name);
+        }
+
+        private Genre GetGenreByName(string name)
+        {
+            return _applicationDb.Genres.SingleOrDefault(genre => genre.Name == name);
+        }
     }
 }
