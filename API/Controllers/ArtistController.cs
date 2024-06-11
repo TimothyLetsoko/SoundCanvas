@@ -77,7 +77,7 @@ namespace API.Controllers
             var toAdd = new Artist
             {
                 Id = model.Id,
-                Name = model.Name,
+                Name = model.Name.ToLower(),
                 PhotoUrl = model.PhotoUrl,
                 Genre = fetchedGenre
             };
@@ -86,6 +86,42 @@ namespace API.Controllers
             _applicationDb.SaveChanges();
 
             return CreatedAtAction(nameof(GetOne), new { id = toAdd.Id }, toAdd);
+        }
+
+        [HttpPut("update")]
+        public ActionResult Update(ArtistAddEditDto model)
+        {
+            var fetchedArtist = _applicationDb.Artists.FirstOrDefault(artist => artist.Id == model.Id);
+
+            if (fetchedArtist == null)
+            {
+                return NotFound("Artist Id does not exist");
+            }
+
+            if (ArtistNameExists(model.Name.ToLower()))
+            {
+                return BadRequest("Artist Name Already exists!");
+            }
+
+            var fetchedGenre = GetGenreByName(model.Genre.ToLower());
+
+            if (fetchedGenre == null)
+            {
+                return BadRequest("Genre does not exist");
+            }
+
+            var toUpdate = new Artist
+            {
+                Id= model.Id,
+                Name = model.Name.ToLower(),
+                PhotoUrl = model.PhotoUrl,
+                Genre = fetchedGenre
+            };
+
+            _applicationDb.Artists.Add(toUpdate);
+            _applicationDb.SaveChanges();
+
+            return NoContent();
         }
 
         private bool ArtistNameExists(string name)
