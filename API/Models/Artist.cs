@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.Models
@@ -14,5 +15,6 @@ namespace API.Models
         [ForeignKey("Genre")]
         public int GenreId { get; set; }
         public Genre Genre { get; set; }
+        public ICollection<ArtistAlbumBridge> Albums { get; set; }
     }
 }
