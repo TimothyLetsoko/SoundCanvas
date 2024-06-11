@@ -90,12 +90,12 @@ namespace API.Controllers
 
         private bool ArtistNameExists(string name)
         {
-            return _applicationDb.Artists.Any(artist => artist.Name == name);
+            return _applicationDb.Artists.Any(artist => artist.Name.ToLower() == name.ToLower());
         }
 
         private Genre GetGenreByName(string name)
         {
-            return _applicationDb.Genres.SingleOrDefault(genre => genre.Name == name);
+            return _applicationDb.Genres.SingleOrDefault(genre => genre.Name.ToLower() == name.ToLower());
         }
     }
 }
