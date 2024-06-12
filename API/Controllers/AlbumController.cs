@@ -21,7 +21,7 @@ namespace API.Controllers
             _applicationDb = applicationDb;
         }
 
-        [HttpGet("getAll")]
+        [HttpGet("get-all")]
         public async Task<ActionResult<List<AlbumDto>>> GetAll()
         {
             var albums = await _applicationDb.Albums
@@ -40,6 +40,33 @@ namespace API.Controllers
                 }).ToListAsync();
 
             return albums;
+        }
+
+        [HttpGet("get-one")]
+        public async Task<ActionResult<AlbumDto>> GetOne(int id)
+        {
+            var album = await _applicationDb.Albums
+                .Where(_ => _.Id == id)
+                .Select(albumDto => new AlbumDto
+                {
+                    Id = albumDto.Id,
+                    Name = albumDto.Name,
+                    PhotoUrl = albumDto.PhotoUrl,
+                    Artists = albumDto.Artists.Select(artistDto => new ArtistDto
+                    {
+                        Id = artistDto.Artist.Id,
+                        Name = artistDto.Artist.Name,
+                        PhotoUrl = artistDto.Artist.PhotoUrl,
+                        Genre = artistDto.Artist.Genre.Name
+                    }).ToList(),
+                }).FirstOrDefaultAsync();
+
+            if (album == null)
+            {
+                return NotFound();
+            }
+
+            return album;
         }
 
 
