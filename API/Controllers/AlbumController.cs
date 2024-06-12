@@ -96,7 +96,44 @@ namespace API.Controllers
             await _applicationDb.SaveChangesAsync();
 
             return NoContent();
+        }
 
+        [HttpPut("update")]
+        public async Task<IActionResult> Update(AlbumAddEditDto model)
+        {
+            var fetchedAlbum = await _applicationDb.Albums
+                .Include(x => x.Artists)
+                .FirstOrDefaultAsync(x => x.Id == model.Id);
+
+            if (fetchedAlbum == null)
+            {
+                return NotFound();
+            }
+
+            if (fetchedAlbum.Name != model.Name.ToLower() && await AlbumNameExitsAsync(model.Name))
+            {
+                return BadRequest("Album name should be unique");
+            }
+
+            //clear all existing Artists
+            foreach (var artist in fetchedAlbum.Artists)
+            {
+                var fetchedArtistAlbumBridge = await _applicationDb.ArtistAlbumBridge
+                    .SingleOrDefaultAsync(x => x.ArtistId == artist.ArtistId && x.AlbumId == fetchedAlbum.Id);
+
+                _applicationDb.ArtistAlbumBridge.Remove(fetchedArtistAlbumBridge);
+            }
+
+            await _applicationDb.SaveChangesAsync();
+
+            fetchedAlbum.Name = model.Name.ToLower();
+            fetchedAlbum.PhotoUrl = model.PhotoUrl;
+
+            await AssignAritistsToAlbumAsync(fetchedAlbum.Id, model.ArtistIds);
+
+            await _applicationDb.SaveChangesAsync();
+
+            return NoContent();
         }
 
         private async Task<bool> AlbumNameExitsAsync(string albumName)
