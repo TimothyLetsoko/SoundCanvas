@@ -136,6 +136,29 @@ namespace API.Controllers
             return NoContent();
         }
 
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var fetchedAlbum = await _applicationDb.Albums.FirstOrDefaultAsync(x => x.Id == id);
+
+            //clear all existing Artists
+            foreach (var artist in fetchedAlbum.Artists)
+            {
+                var fetchedArtistAlbumBridge = await _applicationDb.ArtistAlbumBridge
+                    .SingleOrDefaultAsync(x => x.ArtistId == artist.ArtistId && x.AlbumId == fetchedAlbum.Id);
+
+                _applicationDb.ArtistAlbumBridge.Remove(fetchedArtistAlbumBridge);
+            }
+
+            await _applicationDb.SaveChangesAsync();
+
+            _applicationDb.Albums.Remove(fetchedAlbum);
+
+            await _applicationDb.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         private async Task<bool> AlbumNameExitsAsync(string albumName)
         {
             return await _applicationDb.Albums.AnyAsync(album => album.Name == albumName.ToLower());
