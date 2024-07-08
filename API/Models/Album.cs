@@ -3,11 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.Models
 {
-    public class Genre
+    public class Album
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public ICollection<Artist> Artists { get; set; }
+        public string PhotoUrl { get; set; }
+        public ICollection<ArtistAlbumBridge> Artists { get; set; }
     }
 }

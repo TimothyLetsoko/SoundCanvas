@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace API.Models
+namespace API.DTOs
 {
-    public class Genre
+    public class AlbumAddEditDto
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public ICollection<Artist> Artists { get; set; }
+        public string PhotoUrl { get; set; }
+
+        public List<int> ArtistIds { get; set; }
     }
 }
